@@ -9,3 +9,12 @@ Velocity and VelocityUnsigned is licensed under the GPLv3 license.
 
 Alternatively, you can get the proxy JAR from the [Releases](https://github.com/ygmpxwn/VelocityUnsigned/releases/tag/latest)
 page.
+
+## Building
+
+Velocity is built with [Gradle](https://gradle.org). We recommend to run `./gradlew build` to run the full build cycle.
+
+Once you've built Velocity, you can copy and run the `-all` JAR from `proxy/build/libs`.
+
+Alternatively, you can get the proxy JAR from the [Releases](https://github.com/ygmpxwn/VelocityUnsigned/releases/tag/latest)
+page.
