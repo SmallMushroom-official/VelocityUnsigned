@@ -1,6 +1,6 @@
 # VelocityUnsigned
 
-This is fork of [Velocity](https://github.com/PaperMC/Velocity) that removes signed messages and broke plugins. xD
+This is fork of [Velocity](https://github.com/PaperMC/Velocity) that removes signed messages (that broke plugins).
 
 A Minecraft server proxy with unparalleled server support, scalability,
 and flexibility.
