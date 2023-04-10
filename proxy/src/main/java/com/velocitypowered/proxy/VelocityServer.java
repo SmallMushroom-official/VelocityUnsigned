@@ -245,7 +245,7 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
       this.cm.queryBind(configuration.getBind().getHostString(), configuration.getQueryPort());
     }
 
-    Metrics.VelocityMetrics.startMetrics(this, configuration.getMetrics());
+    //Metrics.VelocityMetrics.startMetrics(this, configuration.getMetrics());
   }
 
   private void registerTranslations() {
