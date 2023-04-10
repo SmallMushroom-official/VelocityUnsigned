@@ -117,8 +117,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
 
-import javax.inject.Named;
-
 /**
  * Represents a player that is connected to the proxy.
  */
@@ -662,7 +660,10 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
       logger.error("{}: disconnected while connecting to {}: {}", this,
           server.getServerInfo().getName(), plainTextReason);
 
-      handleConnectionException(server, disconnectReason, Component.text(server.getServerInfo().getName() + " >> ", NamedTextColor.RED).append(disconnectReason), safe);
+      handleConnectionException(server, disconnectReason,
+              Component.text(
+                      server.getServerInfo().getName() + " >> ", NamedTextColor.RED)
+                      .append(disconnectReason), safe);
 
       /*
       handleConnectionException(server, disconnectReason,
