@@ -646,13 +646,10 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
       logger.info("{}: kicked from server {}: {}", this, server.getServerInfo().getName(),
           plainTextReason);
 
-
-      /*
       handleConnectionException(server, disconnectReason,
           Component.translatable("velocity.error.moved-to-new-server", NamedTextColor.RED,
               Component.text(server.getServerInfo().getName()),
               disconnectReason), safe);
-      */
 
       handleConnectionException(server, disconnectReason, disconnectReason, safe);
 
@@ -661,16 +658,9 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
           server.getServerInfo().getName(), plainTextReason);
 
       handleConnectionException(server, disconnectReason,
-              Component.text(
-                      server.getServerInfo().getName() + " >> ", NamedTextColor.RED)
-                      .append(disconnectReason), safe);
-
-      /*
-      handleConnectionException(server, disconnectReason,
           Component.translatable("velocity.error.cant-connect", NamedTextColor.RED,
               Component.text(server.getServerInfo().getName()),
               disconnectReason), safe);
-       */
     }
   }
 
