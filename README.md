@@ -13,7 +13,7 @@ Velocity is built with [Gradle](https://gradle.org). We recommend to run `./grad
 
 Once you've built Velocity, you can copy and run the `-all` JAR from `proxy/build/libs`.
 
-Alternatively, you can get the proxy JAR from the [Releases](https://github.com/ygmpxwn/VelocityUnsigned/releases/tag/latest)
+Alternatively, you can get the proxy JAR from the [Releases](https://github.com/ygmpxwn/VelocityUnsigned/releases)
 page.
 
 You can also read about [Sync](https://github.com/ygmpxwn/VelocityUnsigned/blob/dev/3.0.0/SYNC.md).
