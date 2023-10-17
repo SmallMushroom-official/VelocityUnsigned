@@ -22,6 +22,7 @@ import com.velocitypowered.proxy.VelocityServer;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.protocol.packet.chat.CommandHandler;
 import java.util.concurrent.CompletableFuture;
+
 public class SessionCommandHandler implements CommandHandler<SessionPlayerCommand> {
 
   private final ConnectedPlayer player;

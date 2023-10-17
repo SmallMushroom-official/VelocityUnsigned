@@ -18,6 +18,7 @@
 package com.velocitypowered.proxy.protocol.packet.chat.keyed;
 
 import com.velocitypowered.api.event.command.CommandExecuteEvent;
+import com.velocitypowered.api.proxy.crypto.IdentifiedKey;
 import com.velocitypowered.proxy.VelocityServer;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.protocol.packet.chat.CommandHandler;
@@ -43,6 +44,7 @@ public class KeyedCommandHandler implements CommandHandler<KeyedPlayerCommand> {
   public void handlePlayerCommandInternal(KeyedPlayerCommand packet) {
     queueCommandResult(this.server, this.player, event -> {
       CommandExecuteEvent.CommandResult result = event.getResult();
+      IdentifiedKey playerKey = player.getIdentifiedKey();
       if (result == CommandExecuteEvent.CommandResult.denied()) {
         return CompletableFuture.completedFuture(null);
       }
@@ -55,7 +57,7 @@ public class KeyedCommandHandler implements CommandHandler<KeyedPlayerCommand> {
             .asPlayer(this.player);
 
         if (!packet.isUnsigned() && commandToRun.equals(packet.getCommand())) {
-          return CompletableFuture.completedFuture(packet);
+            return CompletableFuture.completedFuture(packet);
         }
         return CompletableFuture.completedFuture(write.toServer());
       }
