@@ -206,7 +206,6 @@ public class VelocityCommand implements SimpleCommand {
 
   private static class Info implements SubCommand {
 
-    private static final TextColor VELOCITY_COLOR = TextColor.fromHexString("#09add3");
     private final ProxyServer server;
 
     private Info(ProxyServer server) {
@@ -224,38 +223,38 @@ public class VelocityCommand implements SimpleCommand {
 
       Component velocity = Component.text().content(version.getName() + " ")
           .decoration(TextDecoration.BOLD, true)
-          .color(VELOCITY_COLOR)
+          .color(TextColor.fromHexString("#fca800"))
           .append(Component.text(version.getVersion()).decoration(TextDecoration.BOLD, false))
           .build();
-      Component copyright = Component
-          .translatable("velocity.command.version-copyright",
-              Component.text(version.getVendor()),
-              Component.text(version.getName()));
+
+      Component copyright = Component.translatable("velocity.command.version-copyright",
+              Component.text(version.getVendor()), Component.text(version.getName()));
+
       source.sendMessage(velocity);
       source.sendMessage(copyright);
 
-      if (version.getName().equals("Velocity")) {
-        TextComponent embellishment = Component.text()
-            .append(Component.text().content("velocitypowered.com")
-                .color(NamedTextColor.GREEN)
-                .clickEvent(
-                    ClickEvent.openUrl("https://velocitypowered.com"))
-                .build())
-            .append(Component.text(" - "))
-            .append(Component.text().content("GitHub")
-                .color(NamedTextColor.GREEN)
-                .decoration(TextDecoration.UNDERLINED, true)
-                .clickEvent(ClickEvent.openUrl(
-                    "https://github.com/PaperMC/Velocity"))
-                .build())
-            .build();
-        source.sendMessage(embellishment);
-      }
+      TextComponent embellishment = Component.text()
+              .append(Component.text().content("Download now from ")
+                      .color(NamedTextColor.GRAY)
+                      .build())
+              .append(Component.text().content("GitHub - @ygmpxwn/VelocityUnsigned")
+                      .color(NamedTextColor.YELLOW)
+                      .clickEvent(ClickEvent.openUrl(
+                              "https://github.com/ygmpxwn/VelocityUnsigned"))
+                      .build())
+              .append(Component.text().content(" (Click)")
+                      .color(NamedTextColor.GRAY)
+                      .clickEvent(ClickEvent.openUrl(
+                              "https://github.com/ygmpxwn/VelocityUnsigned"))
+                      .build())
+              .build();
+      source.sendMessage(embellishment);
     }
 
     @Override
     public boolean hasPermission(final CommandSource source, final String @NonNull [] args) {
-      return source.getPermissionValue("velocity.command.info") != Tristate.FALSE;
+      //return source.getPermissionValue("velocity.command.info") != Tristate.FALSE;
+      return true;
     }
   }
 
