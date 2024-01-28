@@ -37,6 +37,7 @@ import com.velocitypowered.api.util.Favicon;
 import com.velocitypowered.api.util.GameProfile;
 import com.velocitypowered.api.util.ProxyVersion;
 import com.velocitypowered.proxy.command.VelocityCommandManager;
+import com.velocitypowered.proxy.command.builtin.CallbackCommand;
 import com.velocitypowered.proxy.command.builtin.GlistCommand;
 import com.velocitypowered.proxy.command.builtin.SendCommand;
 import com.velocitypowered.proxy.command.builtin.ServerCommand;
@@ -60,7 +61,6 @@ import com.velocitypowered.proxy.util.AddressUtil;
 import com.velocitypowered.proxy.util.ClosestLocaleMatcher;
 import com.velocitypowered.proxy.util.ResourceUtils;
 import com.velocitypowered.proxy.util.VelocityChannelRegistrar;
-import com.velocitypowered.proxy.util.bossbar.AdventureBossBarManager;
 import com.velocitypowered.proxy.util.ratelimit.Ratelimiter;
 import com.velocitypowered.proxy.util.ratelimit.Ratelimiters;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -71,6 +71,7 @@ import io.netty.channel.EventLoopGroup;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
+import java.net.http.HttpClient;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.AccessController;
@@ -100,7 +101,6 @@ import net.kyori.adventure.translation.GlobalTranslator;
 import net.kyori.adventure.translation.TranslationRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.asynchttpclient.AsyncHttpClient;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -143,6 +143,7 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
 
   private final ConnectionManager cm;
   private final ProxyOptions options;
+  private final HttpClient httpClient;
   private @MonotonicNonNull VelocityConfiguration configuration;
   private @MonotonicNonNull KeyPair serverKeyPair;
   private final ServerMap servers;
@@ -150,7 +151,6 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
   private final AtomicBoolean shutdownInProgress = new AtomicBoolean(false);
   private boolean shutdown = false;
   private final VelocityPluginManager pluginManager;
-  private final AdventureBossBarManager bossBarManager;
 
   private final Map<UUID, ConnectedPlayer> connectionsByUuid = new ConcurrentHashMap<>();
   private final Map<String, ConnectedPlayer> connectionsByName = new ConcurrentHashMap<>();
@@ -168,10 +168,10 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
     scheduler = new VelocityScheduler(pluginManager);
     console = new VelocityConsole(this);
     cm = new ConnectionManager(this);
+    httpClient = HttpClient.newHttpClient();
     servers = new ServerMap(this);
     serverListPingHandler = new ServerListPingHandler(this);
     this.options = options;
-    this.bossBarManager = new AdventureBossBarManager();
   }
 
   public KeyPair getServerKeyPair() {
@@ -190,11 +190,11 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
     String implVersion;
     String implVendor;
     if (pkg != null) {
-      implName = MoreObjects.firstNonNull(pkg.getImplementationTitle(), "Velocity Unsigned");
+      implName = MoreObjects.firstNonNull(pkg.getImplementationTitle(), "Velocity");
       implVersion = MoreObjects.firstNonNull(pkg.getImplementationVersion(), "<unknown>");
       implVendor = MoreObjects.firstNonNull(pkg.getImplementationVendor(), "Velocity Contributors");
     } else {
-      implName = "Velocity Unsigned";
+      implName = "Velocity";
       implVersion = "<unknown>";
       implVendor = "Velocity Contributors";
     }
@@ -224,8 +224,9 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
     cm.logChannelInformation();
 
     // Initialize commands first
-    commandManager.register("velocity", new VelocityCommand(this), "proxy", "bungee");
-    commandManager.register("server", new ServerCommand(this));
+    commandManager.register("proxy", VelocityCommand.create(this), "bungee");
+    commandManager.register(CallbackCommand.create());
+    commandManager.register(ServerCommand.create(this));
     commandManager.register("shutdown", ShutdownCommand.command(this),
         "end", "stop");
     new GlistCommand(this).register();
@@ -255,11 +256,17 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
       this.cm.bind(configuration.getBind());
     }
 
+    final Boolean haproxy = this.options.isHaproxy();
+    if (haproxy != null) {
+      logger.debug("Overriding HAProxy protocol to {} from command line option", haproxy);
+      configuration.setProxyProtocol(haproxy);
+    }
+
     if (configuration.isQueryEnabled()) {
       this.cm.queryBind(configuration.getBind().getHostString(), configuration.getQueryPort());
     }
 
-    //Metrics.VelocityMetrics.startMetrics(this, configuration.getMetrics());
+    Metrics.VelocityMetrics.startMetrics(this, configuration.getMetrics());
   }
 
   private void registerTranslations() {
@@ -591,7 +598,7 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
     this.cm.closeEndpoints(false);
   }
 
-  public AsyncHttpClient getAsyncHttpClient() {
+  public HttpClient getHttpClient() {
     return cm.getHttpClient();
   }
 
@@ -652,7 +659,7 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
   public void unregisterConnection(ConnectedPlayer connection) {
     connectionsByName.remove(connection.getUsername().toLowerCase(Locale.US), connection);
     connectionsByUuid.remove(connection.getUniqueId(), connection);
-    bossBarManager.onDisconnect(connection);
+    connection.disconnected();
   }
 
   @Override
@@ -762,10 +769,6 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
     return audiences;
   }
 
-  public AdventureBossBarManager getBossBarManager() {
-    return bossBarManager;
-  }
-
   /**
    * Returns a Gson instance for use in serializing server ping instances.
    *
@@ -774,10 +777,10 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
    */
   public static Gson getPingGsonInstance(ProtocolVersion version) {
     if (version == ProtocolVersion.UNKNOWN
-        || version.compareTo(ProtocolVersion.MINECRAFT_1_20_3) >= 0) {
+        || version.noLessThan(ProtocolVersion.MINECRAFT_1_20_3)) {
       return MODERN_PING_SERIALIZER;
     }
-    if (version.compareTo(ProtocolVersion.MINECRAFT_1_16) >= 0) {
+    if (version.noLessThan(ProtocolVersion.MINECRAFT_1_16)) {
       return PRE_1_20_3_PING_SERIALIZER;
     }
     return PRE_1_16_PING_SERIALIZER;
