@@ -47,6 +47,7 @@ public class KeyedCommandHandler implements CommandHandler<KeyedPlayerCommandPac
       CommandExecuteEvent.CommandResult result = event.getResult();
       IdentifiedKey playerKey = player.getIdentifiedKey();
       if (result == CommandExecuteEvent.CommandResult.denied()) {
+        /*
         if (playerKey != null) {
           if (!packet.isUnsigned()
               && playerKey.getKeyRevision().noLessThan(IdentifiedKey.Revision.LINKED_V2)) {
@@ -58,6 +59,7 @@ public class KeyedCommandHandler implements CommandHandler<KeyedPlayerCommandPac
                     + "Contact your network administrator."));
           }
         }
+        */
         return CompletableFuture.completedFuture(null);
       }
 
@@ -71,6 +73,7 @@ public class KeyedCommandHandler implements CommandHandler<KeyedPlayerCommandPac
         if (!packet.isUnsigned() && commandToRun.equals(packet.getCommand())) {
           return CompletableFuture.completedFuture(packet);
         } else {
+          /*
           if (!packet.isUnsigned() && playerKey != null
               && playerKey.getKeyRevision().noLessThan(IdentifiedKey.Revision.LINKED_V2)) {
             logger.fatal("A plugin tried to change a command with signed component(s). "
@@ -81,6 +84,7 @@ public class KeyedCommandHandler implements CommandHandler<KeyedPlayerCommandPac
                     + "Contact your network administrator."));
             return CompletableFuture.completedFuture(null);
           }
+          */
           write.message("/" + commandToRun);
         }
         return CompletableFuture.completedFuture(write.toServer());
@@ -91,6 +95,7 @@ public class KeyedCommandHandler implements CommandHandler<KeyedPlayerCommandPac
             return packet;
           }
 
+          /*
           if (!packet.isUnsigned() && playerKey != null
               && playerKey.getKeyRevision().noLessThan(IdentifiedKey.Revision.LINKED_V2)) {
             logger.fatal("A plugin tried to change a command with signed component(s). "
@@ -101,6 +106,7 @@ public class KeyedCommandHandler implements CommandHandler<KeyedPlayerCommandPac
                     + "Contact your network administrator."));
             return null;
           }
+          */
 
           return this.player.getChatBuilderFactory()
               .builder()
