@@ -16,4 +16,8 @@ Once you've built Velocity, you can copy and run the `-all` JAR from `proxy/buil
 Alternatively, you can get the proxy JAR from the [Releases](https://github.com/ygmpxwn/VelocityUnsigned/releases)
 page.
 
-You can also read about [Sync](https://github.com/ygmpxwn/VelocityUnsigned/blob/dev/3.0.0/SYNC.md).
+## Sync Fork
+
+You can merge new commits from `PaperMC/Velocity - dev/3.0.0` to `ygmpxwn/VelocityUnsigned - dev/3.0.0` using:
+1. `git fetch upstream`
+2. `git merge upstream/dev/3.0.0`
