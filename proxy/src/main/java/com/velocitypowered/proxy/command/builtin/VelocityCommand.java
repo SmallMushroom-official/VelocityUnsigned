@@ -178,6 +178,9 @@ public final class VelocityCommand {
                               "https://github.com/ygmpxwn/VelocityUnsigned"))
                       .build())
               .build();
+
+      source.sendMessage(embellishment);
+
       return Command.SINGLE_SUCCESS;
     }
   }
