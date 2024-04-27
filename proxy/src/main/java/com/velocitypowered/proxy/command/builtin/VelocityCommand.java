@@ -46,6 +46,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -68,7 +69,7 @@ import org.apache.logging.log4j.Logger;
  * Implements the {@code /velocity} command and friends.
  */
 public final class VelocityCommand {
-  private static final String USAGE = "/velocity %s";
+  private static final String USAGE = "/velocity <%s>";
 
   @SuppressWarnings("checkstyle:MissingJavadocMethod")
   public static BrigadierCommand create(final VelocityServer server) {
@@ -81,6 +82,7 @@ public final class VelocityCommand {
         .executes(new Heap())
         .build();
     final LiteralCommandNode<CommandSource> info = BrigadierCommand.literalArgumentBuilder("info")
+        .requires(source -> source.getPermissionValue("velocity.command.info") != Tristate.FALSE)
         .executes(new Info(server))
         .build();
     final LiteralCommandNode<CommandSource> plugins = BrigadierCommand
@@ -146,41 +148,48 @@ public final class VelocityCommand {
 
   private record Info(ProxyServer server) implements Command<CommandSource> {
 
+    private static final TextColor VELOCITY_COLOR = TextColor.color(0x09add3);
+
     @Override
     public int run(final CommandContext<CommandSource> context) {
       final CommandSource source = context.getSource();
       final ProxyVersion version = server.getVersion();
 
-      Component velocity = Component.text().content(version.getName() + " ")
-              .decoration(TextDecoration.BOLD, true)
-              .color(TextColor.fromHexString("#fca800"))
-              .append(Component.text(version.getVersion()).decoration(TextDecoration.BOLD, false))
-              .build();
-
-      Component copyright = Component.translatable("velocity.command.version-copyright",
-              Component.text(version.getVendor()), Component.text(version.getName()));
-
+      final Component velocity = Component.text()
+          .content(version.getName() + " ")
+          .decoration(TextDecoration.BOLD, true)
+          .color(VELOCITY_COLOR)
+          .append(Component.text()
+                  .content(version.getVersion())
+                  .decoration(TextDecoration.BOLD, false))
+          .build();
+      final Component copyright = Component
+          .translatable("velocity.command.version-copyright",
+              Component.text(version.getVendor()),
+                  Component.text(version.getName()),
+                  Component.text(LocalDate.now().getYear()));
       source.sendMessage(velocity);
       source.sendMessage(copyright);
 
-      TextComponent embellishment = Component.text()
-              .append(Component.text().content("Download now from ")
-                      .color(NamedTextColor.GRAY)
-                      .build())
-              .append(Component.text().content("GitHub - @ygmpxwn/VelocityUnsigned")
-                      .color(NamedTextColor.YELLOW)
-                      .clickEvent(ClickEvent.openUrl(
-                              "https://github.com/ygmpxwn/VelocityUnsigned"))
-                      .build())
-              .append(Component.text().content(" (Click)")
-                      .color(NamedTextColor.GRAY)
-                      .clickEvent(ClickEvent.openUrl(
-                              "https://github.com/ygmpxwn/VelocityUnsigned"))
-                      .build())
-              .build();
-
-      source.sendMessage(embellishment);
-
+      if (version.getName().equals("Velocity")) {
+        final TextComponent embellishment = Component.text()
+            .append(Component.text()
+                .content("velocitypowered.com")
+                .color(NamedTextColor.GREEN)
+                .clickEvent(
+                    ClickEvent.openUrl("https://velocitypowered.com"))
+                .build())
+            .append(Component.text(" - "))
+            .append(Component.text()
+                .content("GitHub")
+                .color(NamedTextColor.GREEN)
+                .decoration(TextDecoration.UNDERLINED, true)
+                .clickEvent(ClickEvent.openUrl(
+                    "https://github.com/PaperMC/Velocity"))
+                .build())
+            .build();
+        source.sendMessage(embellishment);
+      }
       return Command.SINGLE_SUCCESS;
     }
   }
