@@ -69,7 +69,7 @@ import org.apache.logging.log4j.Logger;
  * Implements the {@code /velocity} command and friends.
  */
 public final class VelocityCommand {
-  private static final String USAGE = "/velocity <%s>";
+  private static final String USAGE = "/velocity %s";
 
   @SuppressWarnings("checkstyle:MissingJavadocMethod")
   public static BrigadierCommand create(final VelocityServer server) {
@@ -148,7 +148,7 @@ public final class VelocityCommand {
 
   private record Info(ProxyServer server) implements Command<CommandSource> {
 
-    private static final TextColor VELOCITY_COLOR = TextColor.color(0x09add3);
+    private static final TextColor VELOCITY_COLOR = TextColor.fromHexString("#fca800");
 
     @Override
     public int run(final CommandContext<CommandSource> context) {
@@ -163,6 +163,7 @@ public final class VelocityCommand {
                   .content(version.getVersion())
                   .decoration(TextDecoration.BOLD, false))
           .build();
+
       final Component copyright = Component
           .translatable("velocity.command.version-copyright",
               Component.text(version.getVendor()),
@@ -171,25 +172,22 @@ public final class VelocityCommand {
       source.sendMessage(velocity);
       source.sendMessage(copyright);
 
-      if (version.getName().equals("Velocity")) {
-        final TextComponent embellishment = Component.text()
-            .append(Component.text()
-                .content("velocitypowered.com")
-                .color(NamedTextColor.GREEN)
-                .clickEvent(
-                    ClickEvent.openUrl("https://velocitypowered.com"))
-                .build())
-            .append(Component.text(" - "))
-            .append(Component.text()
-                .content("GitHub")
-                .color(NamedTextColor.GREEN)
-                .decoration(TextDecoration.UNDERLINED, true)
-                .clickEvent(ClickEvent.openUrl(
-                    "https://github.com/PaperMC/Velocity"))
-                .build())
-            .build();
+      final TextComponent embellishment = Component.text()
+          .append(Component.text().content("Download now from ")
+                  .color(NamedTextColor.GRAY)
+                  .build())
+          .append(Component.text().content("GitHub - @tenu/VelocityUnsigned")
+                  .color(NamedTextColor.YELLOW)
+                  .clickEvent(ClickEvent.openUrl(
+                          "https://github.com/ygmpxwn/VelocityUnsigned"))
+                  .build())
+          .append(Component.text().content(" (Click)")
+                  .color(NamedTextColor.GRAY)
+                  .clickEvent(ClickEvent.openUrl(
+                          "https://github.com/ygmpxwn/VelocityUnsigned"))
+                  .build())
+          .build();
         source.sendMessage(embellishment);
-      }
       return Command.SINGLE_SUCCESS;
     }
   }
