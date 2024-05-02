@@ -82,7 +82,7 @@ public final class VelocityCommand {
         .executes(new Heap())
         .build();
     final LiteralCommandNode<CommandSource> info = BrigadierCommand.literalArgumentBuilder("info")
-        .requires(source -> source.getPermissionValue("velocity.command.info") != Tristate.FALSE)
+        //.requires(source -> source.getPermissionValue("velocity.command.info") != Tristate.FALSE)
         .executes(new Info(server))
         .build();
     final LiteralCommandNode<CommandSource> plugins = BrigadierCommand
@@ -176,7 +176,7 @@ public final class VelocityCommand {
           .append(Component.text().content("Download now from ")
                   .color(NamedTextColor.GRAY)
                   .build())
-          .append(Component.text().content("GitHub - @tenu/VelocityUnsigned")
+          .append(Component.text().content("GitHub - @ygmpxwn/VelocityUnsigned")
                   .color(NamedTextColor.YELLOW)
                   .clickEvent(ClickEvent.openUrl(
                           "https://github.com/ygmpxwn/VelocityUnsigned"))
