@@ -47,6 +47,7 @@ public class SessionCommandHandler implements CommandHandler<SessionPlayerComman
     if (packet.lastSeenMessages == null) {
       return null;
     }
+    /*
     if (packet.isSigned()) {
       // Any signed message produced by the client *must* be passed through to the server in order to maintain a
       // consistent state for future messages.
@@ -58,6 +59,7 @@ public class SessionCommandHandler implements CommandHandler<SessionPlayerComman
               + "Contact your network administrator."));
       return null;
     }
+    */
     // An unsigned command with a 'last seen' update will not happen as of 1.20.5+, but for earlier versions - we still
     // need to pass through the acknowledgement
     final int offset = packet.lastSeenMessages.getOffset();
@@ -77,6 +79,7 @@ public class SessionCommandHandler implements CommandHandler<SessionPlayerComman
 
   @Nullable
   private MinecraftPacket modifyCommand(SessionPlayerCommandPacket packet, String newCommand) {
+      /*
     if (packet.isSigned()) {
       logger.fatal("A plugin tried to change a command with signed component(s). "
           + "This is not supported. "
@@ -86,6 +89,7 @@ public class SessionCommandHandler implements CommandHandler<SessionPlayerComman
               + "Contact your network administrator."));
       return null;
     }
+    */
 
     return this.player.getChatBuilderFactory()
         .builder()
