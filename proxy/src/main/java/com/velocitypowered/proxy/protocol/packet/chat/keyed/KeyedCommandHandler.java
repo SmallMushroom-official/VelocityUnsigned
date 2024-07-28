@@ -42,7 +42,7 @@ public class KeyedCommandHandler implements CommandHandler<KeyedPlayerCommandPac
 
   @Override
   public void handlePlayerCommandInternal(KeyedPlayerCommandPacket packet) {
-    queueCommandResult(this.server, this.player, event -> {
+    queueCommandResult(this.server, this.player, (event, newLastSeenMessages) -> {
       CommandExecuteEvent.CommandResult result = event.getResult();
       IdentifiedKey playerKey = player.getIdentifiedKey();
       if (result == CommandExecuteEvent.CommandResult.denied()) {
@@ -116,6 +116,6 @@ public class KeyedCommandHandler implements CommandHandler<KeyedPlayerCommandPac
         }
         return null;
       });
-    }, packet.getCommand(), packet.getTimestamp());
+    }, packet.getCommand(), packet.getTimestamp(), null);
   }
 }
