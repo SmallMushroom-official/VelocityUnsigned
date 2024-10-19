@@ -61,10 +61,11 @@ public class SessionChatHandler implements ChatHandler<SessionPlayerChatPacket> 
 
               if (chatResult.getMessage().map(str -> !str.equals(packet.getMessage()))
                   .orElse(false)) {
-                return this.player.getChatBuilderFactory().builder().message(packet.message)
-                    .setTimestamp(packet.timestamp)
-                    .setLastSeenMessages(newLastSeenMessages)
-                    .toServer();
+                  return this.player.getChatBuilderFactory().builder()
+                          .message(chatResult.getMessage().orElse(packet.getMessage()))
+                          .setTimestamp(packet.timestamp)
+                          .setLastSeenMessages(newLastSeenMessages)
+                          .toServer();
               }
               return packet.withLastSeenMessages(newLastSeenMessages);
             })
