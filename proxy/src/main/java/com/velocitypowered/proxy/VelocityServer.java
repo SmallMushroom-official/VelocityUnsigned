@@ -240,11 +240,35 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
     cm.logChannelInformation();
 
     // Initialize commands first
-    commandManager.register(VelocityCommand.create(this));
-    commandManager.register(CallbackCommand.create());
-    commandManager.register(ServerCommand.create(this));
-    commandManager.register("shutdown", ShutdownCommand.command(this),
-        "end", "stop");
+    final BrigadierCommand velocityParentCommand = VelocityCommand.create(this);
+    commandManager.register(
+        commandManager.metaBuilder(velocityParentCommand)
+            .plugin(VelocityVirtualPlugin.INSTANCE)
+            .build(),
+        velocityParentCommand
+    );
+    final BrigadierCommand callbackCommand = CallbackCommand.create();
+    commandManager.register(
+        commandManager.metaBuilder(callbackCommand)
+            .plugin(VelocityVirtualPlugin.INSTANCE)
+            .build(),
+        callbackCommand
+    );
+    final BrigadierCommand serverCommand = ServerCommand.create(this);
+    commandManager.register(
+        commandManager.metaBuilder(serverCommand)
+            .plugin(VelocityVirtualPlugin.INSTANCE)
+            .build(),
+        serverCommand
+    );
+    final BrigadierCommand shutdownCommand = ShutdownCommand.command(this);
+    commandManager.register(
+        commandManager.metaBuilder(shutdownCommand)
+            .plugin(VelocityVirtualPlugin.INSTANCE)
+            .aliases("end", "stop")
+            .build(),
+        shutdownCommand
+    );
     new GlistCommand(this).register();
     new SendCommand(this).register();
 
